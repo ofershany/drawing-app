@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Drawing App 🎨</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .toolbar {
+            background: white;
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            align-items: center;
+        }
+
+        .tool-btn {
+            width: 60px;
+            height: 60px;
+            border: 3px solid #333;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        .tool-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .tool-btn.active {
+            border-color: #ffd700;
+            border-width: 5px;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+        }
+
+        .color-btn {
+            width: 60px;
+            height: 60px;
+            border: 3px solid #333;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .color-btn:hover {
+            transform: scale(1.15);
+        }
+
+        .color-btn.active {
+            border-width: 6px;
+            border-color: #ffd700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+        }
+
+        .separator {
+            width: 2px;
+            height: 60px;
+            background: #ddd;
+            margin: 0 5px;
+        }
+
+        #canvas {
+            background: white;
+            cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M3 21l4-4L19 5l-2-2L5 15l-2 6z' fill='%234169E1' stroke='%23000' stroke-width='1.5'/%3E%3Cpath d='M5 15l2 2' stroke='%23FFF' stroke-width='1'/%3E%3C/svg%3E") 0 24, auto;
+            flex: 1;
+            margin: 10px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .clear-btn {
+            background: #ff4757;
+            color: white;
+            font-size: 18px;
+            padding: 0 20px;
+        }
+
+        .clear-btn:hover {
+            background: #ff3838;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin-right: auto;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .size-dropdown {
+            position: relative;
+        }
+
+        .size-toggle-btn {
+            width: 60px;
+            height: 60px;
+            border: 3px solid #333;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+        }
+
+        .size-toggle-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .size-toggle-btn.active {
+            border-color: #667eea;
+            border-width: 4px;
+        }
+
+        .size-current-preview {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .size-current-preview-dot {
+            border-radius: 50%;
+            background: #333;
+        }
+
+        .size-label-text {
+            font-size: 10px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .size-menu {
+            position: absolute;
+            top: 70px;
+            left: 0;
+            background: white;
+            border: 3px solid #333;
+            border-radius: 12px;
+            padding: 10px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .size-menu.show {
+            display: flex;
+        }
+
+        .size-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        .size-option:hover {
+            background: #f0f0f0;
+        }
+
+        .size-option.selected {
+            background: #667eea;
+            color: white;
+        }
+
+        .size-option-preview {
+            border-radius: 50%;
+            background: #333;
+            flex-shrink: 0;
+        }
+
+        .size-option.selected .size-option-preview {
+            background: white;
+        }
+
+        .size-option-label {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .shape-dropdown {
+            position: relative;
+        }
+
+        .shape-toggle-btn {
+            width: 60px;
+            height: 60px;
+            border: 3px solid #333;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .shape-toggle-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .shape-toggle-btn.active {
+            border-color: #ffd700;
+            border-width: 5px;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+        }
+
+        .shape-menu {
+            position: absolute;
+            top: 70px;
+            left: 0;
+            background: white;
+            border: 3px solid #333;
+            border-radius: 12px;
+            padding: 10px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .shape-menu.show {
+            display: flex;
+        }
+
+        .shape-option {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .shape-option:hover {
+            background: #f0f0f0;
+        }
+
+        .shape-option.selected {
+            background: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <div class="title">🎨 My Drawing App</div>
+
+        <button class="tool-btn active" data-tool="pen" title="Pen">
+            <svg width="36" height="36" viewBox="0 0 24 24">
+                <path d="M3 21l4-4L19 5l-2-2L5 15l-2 6z" fill="#4169E1" stroke="#000" stroke-width="1.5"/>
+                <path d="M5 15l2 2" stroke="#FFF" stroke-width="1"/>
+            </svg>
+        </button>
+        <button class="tool-btn" data-tool="eraser" title="Eraser">
+            <svg width="36" height="36" viewBox="0 0 32 32">
+                <path d="M22 4L8 18l6 6 14-14-6-6z" fill="#FF69B4" stroke="#000" stroke-width="2"/>
+                <path d="M8 18l-4 4 6 6 4-4z" fill="#FFC0CB" stroke="#000" stroke-width="2"/>
+            </svg>
+        </button>
+
+        <div class="size-dropdown">
+            <button class="size-toggle-btn" id="sizeToggle" title="Brush Size">
+                <div class="size-current-preview" id="currentSizePreview">
+                    <div class="size-current-preview-dot" style="width: 15px; height: 15px;"></div>
+                </div>
+                <div class="size-label-text">Size</div>
+            </button>
+            <div class="size-menu" id="sizeMenu">
+                <div class="size-option" data-size="4">
+                    <div class="size-option-preview" style="width: 10px; height: 10px;"></div>
+                    <div class="size-option-label">Tiny</div>
+                </div>
+                <div class="size-option" data-size="8">
+                    <div class="size-option-preview" style="width: 14px; height: 14px;"></div>
+                    <div class="size-option-label">Small</div>
+                </div>
+                <div class="size-option selected" data-size="12">
+                    <div class="size-option-preview" style="width: 18px; height: 18px;"></div>
+                    <div class="size-option-label">Medium</div>
+                </div>
+                <div class="size-option" data-size="18">
+                    <div class="size-option-preview" style="width: 22px; height: 22px;"></div>
+                    <div class="size-option-label">Large</div>
+                </div>
+                <div class="size-option" data-size="28">
+                    <div class="size-option-preview" style="width: 26px; height: 26px;"></div>
+                    <div class="size-option-label">Huge</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="separator"></div>
+
+        <div class="shape-dropdown">
+            <button class="shape-toggle-btn" id="shapeToggle" title="Shapes">
+                <svg width="36" height="36" viewBox="0 0 32 32" id="currentShapeIcon">
+                    <path d="M16 4l3.5 10.5H30l-9 6.5 3.5 10.5-8.5-6-8.5 6 3.5-10.5-9-6.5h10.5z" fill="#FFD700" stroke="#000" stroke-width="1.5"/>
+                </svg>
+            </button>
+            <div class="shape-menu" id="shapeMenu">
+                <div class="shape-option" data-shape="circle">
+                    <svg width="40" height="40" viewBox="0 0 32 32">
+                        <circle cx="16" cy="16" r="12" fill="#FF6B00" stroke="#000" stroke-width="2"/>
+                    </svg>
+                </div>
+                <div class="shape-option" data-shape="square">
+                    <svg width="40" height="40" viewBox="0 0 32 32">
+                        <rect x="6" y="6" width="20" height="20" fill="#0080FF" stroke="#000" stroke-width="2"/>
+                    </svg>
+                </div>
+                <div class="shape-option selected" data-shape="star">
+                    <svg width="40" height="40" viewBox="0 0 32 32">
+                        <path d="M16 4l3.5 10.5H30l-9 6.5 3.5 10.5-8.5-6-8.5 6 3.5-10.5-9-6.5h10.5z" fill="#FFD700" stroke="#000" stroke-width="1.5"/>
+                    </svg>
+                </div>
+                <div class="shape-option" data-shape="heart">
+                    <svg width="40" height="40" viewBox="0 0 32 32">
+                        <path d="M16 28s-10-6-10-14c0-3 2-5 5-5 2 0 4 1 5 3 1-2 3-3 5-3 3 0 5 2 5 5 0 8-10 14-10 14z" fill="#FF69B4" stroke="#000" stroke-width="1.5"/>
+                    </svg>
+                </div>
+                <div class="shape-option" data-shape="smiley">
+                    <svg width="40" height="40" viewBox="0 0 32 32">
+                        <circle cx="16" cy="16" r="12" fill="#FFD700" stroke="#000" stroke-width="2"/>
+                        <circle cx="12" cy="13" r="2" fill="#000"/>
+                        <circle cx="20" cy="13" r="2" fill="#000"/>
+                        <path d="M10 19 Q16 23 22 19" stroke="#000" stroke-width="2" fill="none" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="shape-option" data-shape="hexagon">
+                    <svg width="40" height="40" viewBox="0 0 32 32">
+                        <path d="M16 4l8 4.5v9L16 22l-8-4.5v-9z" fill="#A020F0" stroke="#000" stroke-width="2"/>
+                    </svg>
+                </div>
+                <div class="shape-option" data-shape="bunny">
+                    <svg width="40" height="40" viewBox="0 0 32 32">
+                        <!-- Head -->
+                        <circle cx="16" cy="18" r="8" fill="#FFF" stroke="#000" stroke-width="1.5"/>
+                        <!-- Left ear -->
+                        <ellipse cx="12" cy="8" rx="3" ry="7" fill="#FFF" stroke="#000" stroke-width="1.5"/>
+                        <!-- Right ear -->
+                        <ellipse cx="20" cy="8" rx="3" ry="7" fill="#FFF" stroke="#000" stroke-width="1.5"/>
+                        <!-- Left eye -->
+                        <circle cx="13" cy="17" r="1.5" fill="#000"/>
+                        <!-- Right eye -->
+                        <circle cx="19" cy="17" r="1.5" fill="#000"/>
+                        <!-- Nose -->
+                        <circle cx="16" cy="20" r="1" fill="#FF69B4"/>
+                        <!-- Mouth -->
+                        <path d="M16 20 Q14 22 12 21 M16 20 Q18 22 20 21" stroke="#000" stroke-width="1" fill="none" stroke-linecap="round"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="separator"></div>
+
+        <button class="color-btn active" data-color="#FF0000" style="background: #FF0000;" title="Red"></button>
+        <button class="color-btn" data-color="#FF6B00" style="background: #FF6B00;" title="Orange"></button>
+        <button class="color-btn" data-color="#FFD700" style="background: #FFD700;" title="Yellow"></button>
+        <button class="color-btn" data-color="#00FF00" style="background: #00FF00;" title="Green"></button>
+        <button class="color-btn" data-color="#0080FF" style="background: #0080FF;" title="Blue"></button>
+        <button class="color-btn" data-color="#A020F0" style="background: #A020F0;" title="Purple"></button>
+        <button class="color-btn" data-color="#FF69B4" style="background: #FF69B4;" title="Pink"></button>
+        <button class="color-btn" data-color="#000000" style="background: #000000;" title="Black"></button>
+        <button class="color-btn" data-color="rainbow" style="background: linear-gradient(90deg, #FF0000, #FF7F00, #FFFF00, #00FF00, #0000FF, #4B0082, #9400D3);" title="Rainbow"></button>
+
+        <div class="separator"></div>
+
+        <button class="tool-btn clear-btn" id="clearBtn" title="Clear Canvas">🗑️<br>Clear</button>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Set canvas size
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Drawing state
+        let isDrawing = false;
+        let currentTool = 'pen';
+        let currentColor = '#FF0000';
+        let brushSize = 12; // Medium is the default
+        let currentShape = 'star';
+
+        // Rainbow colors
+        const rainbowColors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#9400D3'];
+        let currentRainbowColor = rainbowColors[0];
+        let rainbowStrokeLength = 0;
+        const rainbowColorChangeDistance = 50; // Change color every 50 pixels of drawing
+
+        function getRandomRainbowColor() {
+            return rainbowColors[Math.floor(Math.random() * rainbowColors.length)];
+        }
+
+        function getNextRainbowColor() {
+            let newColor;
+            do {
+                newColor = getRandomRainbowColor();
+            } while (newColor === currentRainbowColor); // Ensure we get a different color
+            return newColor;
+        }
+
+        function createRainbowGradient(x, y, size) {
+            const gradient = ctx.createRadialGradient(x, y, 0, x, y, size);
+            rainbowColors.forEach((color, index) => {
+                gradient.addColorStop(index / (rainbowColors.length - 1), color);
+            });
+            return gradient;
+        }
+
+        function createRainbowLinearGradient(x, y, size) {
+            const gradient = ctx.createLinearGradient(x, y - size, x, y + size);
+            rainbowColors.forEach((color, index) => {
+                gradient.addColorStop(index / (rainbowColors.length - 1), color);
+            });
+            return gradient;
+        }
+
+        // Create dynamic cursor based on brush size
+        function createPenCursor(size, color) {
+            // Use actual brush size for cursor
+            const cursorSize = Math.max(size * 4, 32); // Ensure minimum visible size
+            const center = cursorSize / 2;
+            const radius = size / 2; // Half brush size for radius
+
+            // For rainbow, use a multi-color circle
+            const fillColor = color === 'rainbow' ? 'none' : color;
+            const strokeColor = color === 'rainbow' ? 'url(#rainbowGrad)' : color;
+
+            const rainbowGradient = color === 'rainbow' ?
+                `<defs>
+                    <linearGradient id="rainbowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#FF0000"/>
+                        <stop offset="16%" style="stop-color:#FF7F00"/>
+                        <stop offset="33%" style="stop-color:#FFFF00"/>
+                        <stop offset="50%" style="stop-color:#00FF00"/>
+                        <stop offset="66%" style="stop-color:#0000FF"/>
+                        <stop offset="83%" style="stop-color:#4B0082"/>
+                        <stop offset="100%" style="stop-color:#9400D3"/>
+                    </linearGradient>
+                </defs>` : '';
+
+            const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${cursorSize}' height='${cursorSize}' viewBox='0 0 ${cursorSize} ${cursorSize}'>
+                ${rainbowGradient}
+                <circle cx='${center}' cy='${center}' r='${radius}' fill='${fillColor}' stroke='${strokeColor}' stroke-width='${Math.max(1, size / 6)}'/>
+            </svg>`;
+            const encoded = encodeURIComponent(svg);
+            return `url("data:image/svg+xml,${encoded}") ${center} ${center}, crosshair`;
+        }
+
+        function createEraserCursor(size) {
+            // Eraser is 2x brush size
+            const eraserSize = size * 2;
+            const cursorSize = Math.max(eraserSize * 2, 32); // Ensure minimum visible size
+            const center = cursorSize / 2;
+            const radius = eraserSize / 2; // Half eraser size for radius
+
+            const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${cursorSize}' height='${cursorSize}' viewBox='0 0 ${cursorSize} ${cursorSize}'>
+                <circle cx='${center}' cy='${center}' r='${radius}' fill='white' fill-opacity='0.5' stroke='black' stroke-width='2'/>
+            </svg>`;
+            const encoded = encodeURIComponent(svg);
+            return `url("data:image/svg+xml,${encoded}") ${center} ${center}, crosshair`;
+        }
+
+        function createShapeCursor(shape) {
+            const cursorSize = 32; // Fixed reasonable size for all stamps
+            const center = cursorSize / 2;
+            let shapeContent = '';
+
+            switch(shape) {
+                case 'circle':
+                    shapeContent = `<circle cx='${center}' cy='${center}' r='10' fill='#FF6B00' stroke='#000' stroke-width='1.5'/>`;
+                    break;
+                case 'square':
+                    shapeContent = `<rect x='6' y='6' width='20' height='20' fill='#0080FF' stroke='#000' stroke-width='1.5'/>`;
+                    break;
+                case 'star':
+                    shapeContent = `<path d='M16 4l3.5 10.5H30l-9 6.5 3.5 10.5-8.5-6-8.5 6 3.5-10.5-9-6.5h10.5z' fill='#FFD700' stroke='#000' stroke-width='1'/>`;
+                    break;
+                case 'heart':
+                    shapeContent = `<path d='M16 28s-10-6-10-14c0-3 2-5 5-5 2 0 4 1 5 3 1-2 3-3 5-3 3 0 5 2 5 5 0 8-10 14-10 14z' fill='#FF69B4' stroke='#000' stroke-width='1'/>`;
+                    break;
+                case 'smiley':
+                    shapeContent = `<circle cx='${center}' cy='${center}' r='12' fill='#FFD700' stroke='#000' stroke-width='1.5'/>
+                        <circle cx='12' cy='13' r='2' fill='#000'/>
+                        <circle cx='20' cy='13' r='2' fill='#000'/>
+                        <path d='M10 19 Q16 23 22 19' stroke='#000' stroke-width='1.5' fill='none' stroke-linecap='round'/>`;
+                    break;
+                case 'hexagon':
+                    shapeContent = `<path d='M16 4l8 4.5v9L16 22l-8-4.5v-9z' fill='#A020F0' stroke='#000' stroke-width='1.5'/>`;
+                    break;
+                case 'bunny':
+                    shapeContent = `<circle cx='16' cy='18' r='8' fill='#FFF' stroke='#000' stroke-width='1'/>
+                        <ellipse cx='12' cy='8' rx='3' ry='7' fill='#FFF' stroke='#000' stroke-width='1'/>
+                        <ellipse cx='20' cy='8' rx='3' ry='7' fill='#FFF' stroke='#000' stroke-width='1'/>
+                        <circle cx='13' cy='17' r='1.5' fill='#000'/>
+                        <circle cx='19' cy='17' r='1.5' fill='#000'/>
+                        <circle cx='16' cy='20' r='1' fill='#FF69B4'/>
+                        <path d='M16 20 Q14 22 12 21 M16 20 Q18 22 20 21' stroke='#000' stroke-width='1' fill='none' stroke-linecap='round'/>`;
+                    break;
+                default:
+                    shapeContent = `<circle cx='${center}' cy='${center}' r='10' fill='#FF6B00' stroke='#000' stroke-width='1.5'/>`;
+            }
+
+            const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${cursorSize}' height='${cursorSize}' viewBox='0 0 ${cursorSize} ${cursorSize}'>
+                ${shapeContent}
+            </svg>`;
+            const encoded = encodeURIComponent(svg);
+            return `url("data:image/svg+xml,${encoded}") ${center} ${center}, crosshair`;
+        }
+
+        function updateCursor() {
+            if (currentTool === 'pen') {
+                canvas.style.cursor = createPenCursor(brushSize, currentColor);
+            } else if (currentTool === 'eraser') {
+                canvas.style.cursor = createEraserCursor(brushSize);
+            } else if (currentTool === 'shape') {
+                canvas.style.cursor = createShapeCursor(currentShape);
+            } else {
+                canvas.style.cursor = 'pointer';
+            }
+        }
+
+        // Tool buttons
+        document.querySelectorAll('.tool-btn[data-tool]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tool-btn[data-tool]').forEach(b => b.classList.remove('active'));
+                shapeToggle.classList.remove('active');
+                btn.classList.add('active');
+                currentTool = btn.dataset.tool;
+                updateCursor();
+            });
+        });
+
+        // Color buttons
+        document.querySelectorAll('.color-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentColor = btn.dataset.color;
+                // Update cursor to reflect new color
+                updateCursor();
+            });
+        });
+
+        // Size dropdown
+        const sizeToggle = document.getElementById('sizeToggle');
+        const sizeMenu = document.getElementById('sizeMenu');
+        const currentSizePreview = document.getElementById('currentSizePreview');
+
+        sizeToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            sizeMenu.classList.toggle('show');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', () => {
+            sizeMenu.classList.remove('show');
+        });
+
+        sizeMenu.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        // Size option selection
+        document.querySelectorAll('.size-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.size-option').forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                brushSize = parseInt(option.dataset.size);
+
+                // Update the current size preview
+                const previewSize = Math.min(brushSize * 1.5, 26);
+                currentSizePreview.innerHTML = `<div class="size-current-preview-dot" style="width: ${previewSize}px; height: ${previewSize}px;"></div>`;
+
+                // Update cursor to reflect new size
+                updateCursor();
+
+                sizeMenu.classList.remove('show');
+            });
+        });
+
+        // Shape dropdown
+        const shapeToggle = document.getElementById('shapeToggle');
+        const shapeMenu = document.getElementById('shapeMenu');
+        const currentShapeIcon = document.getElementById('currentShapeIcon');
+
+        shapeToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            shapeMenu.classList.toggle('show');
+            shapeToggle.classList.add('active');
+            currentTool = 'shape';
+            updateCursor();
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', () => {
+            shapeMenu.classList.remove('show');
+        });
+
+        shapeMenu.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        // Shape option selection
+        document.querySelectorAll('.shape-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.shape-option').forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                currentShape = option.dataset.shape;
+                currentTool = 'shape';
+
+                // Update the current shape icon
+                currentShapeIcon.innerHTML = option.querySelector('svg').innerHTML;
+
+                // Mark shape button as active
+                document.querySelectorAll('.tool-btn[data-tool]').forEach(b => b.classList.remove('active'));
+                shapeToggle.classList.add('active');
+
+                // Update cursor to show the selected shape
+                updateCursor();
+
+                shapeMenu.classList.remove('show');
+            });
+        });
+
+        // Clear button
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        });
+
+        // Drawing functions
+        function startDrawing(e) {
+            const pos = getMousePos(e);
+
+            if (currentTool === 'pen' || currentTool === 'eraser') {
+                isDrawing = true;
+                // Reset rainbow tracking for new stroke
+                if (currentColor === 'rainbow') {
+                    rainbowStrokeLength = 0;
+                    currentRainbowColor = getRandomRainbowColor();
+                }
+                ctx.beginPath();
+                ctx.moveTo(pos.x, pos.y);
+
+                // Draw a dot at the click position for single clicks
+                if (currentTool === 'pen') {
+                    ctx.strokeStyle = currentColor === 'rainbow' ? currentRainbowColor : currentColor;
+                    ctx.lineWidth = brushSize;
+                } else if (currentTool === 'eraser') {
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = brushSize * 2;
+                }
+                ctx.lineCap = 'round';
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(pos.x, pos.y);
+
+                lastPos = {x: pos.x, y: pos.y};
+            } else if (currentTool === 'shape') {
+                drawShape(pos.x, pos.y, currentShape);
+            }
+        }
+
+        let lastPos = null;
+
+        function draw(e) {
+            if (!isDrawing) return;
+
+            const pos = getMousePos(e);
+
+            if (currentTool === 'pen') {
+                // Handle rainbow mode
+                if (currentColor === 'rainbow') {
+                    // Calculate distance traveled
+                    if (lastPos) {
+                        const dx = pos.x - lastPos.x;
+                        const dy = pos.y - lastPos.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        rainbowStrokeLength += distance;
+
+                        // Change color if we've traveled enough distance
+                        if (rainbowStrokeLength >= rainbowColorChangeDistance) {
+                            rainbowStrokeLength = 0;
+                            currentRainbowColor = getNextRainbowColor();
+                            // Start new path with new color
+                            ctx.stroke();
+                            ctx.beginPath();
+                            ctx.moveTo(lastPos.x, lastPos.y);
+                        }
+                    }
+                    ctx.strokeStyle = currentRainbowColor;
+                } else {
+                    ctx.strokeStyle = currentColor;
+                }
+
+                ctx.lineWidth = brushSize;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+
+                lastPos = {x: pos.x, y: pos.y};
+            } else if (currentTool === 'eraser') {
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = brushSize * 2;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+            }
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+            lastPos = null;
+        }
+
+        function getMousePos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.type.startsWith('touch') ? e.touches[0] : e;
+            return {
+                x: touch.clientX - rect.left,
+                y: touch.clientY - rect.top
+            };
+        }
+
+        function drawShape(x, y, shape) {
+            // Calculate scale factor based on brush size
+            // Medium (12) is the base size (scale = 1.0)
+            const sizeScale = brushSize / 12;
+
+            ctx.beginPath();
+
+            switch(shape) {
+                case 'circle':
+                    // Circle uses radial gradient
+                    const circleRadius = 40 * sizeScale;
+                    if (currentColor === 'rainbow') {
+                        ctx.fillStyle = createRainbowGradient(x, y, circleRadius + 10);
+                    } else {
+                        ctx.fillStyle = currentColor;
+                    }
+                    ctx.arc(x, y, circleRadius, 0, Math.PI * 2);
+                    break;
+                case 'square':
+                    // Square uses linear gradient (top to bottom)
+                    const squareSize = 40 * sizeScale;
+                    if (currentColor === 'rainbow') {
+                        ctx.fillStyle = createRainbowLinearGradient(x, y, squareSize);
+                    } else {
+                        ctx.fillStyle = currentColor;
+                    }
+                    ctx.fillRect(x - squareSize, y - squareSize, squareSize * 2, squareSize * 2);
+                    return;
+                case 'star':
+                    // Star uses linear gradient (top to bottom)
+                    const starOuter = 45 * sizeScale;
+                    const starInner = 20 * sizeScale;
+                    if (currentColor === 'rainbow') {
+                        ctx.fillStyle = createRainbowLinearGradient(x, y, starOuter);
+                    } else {
+                        ctx.fillStyle = currentColor;
+                    }
+                    const spikes = 5;
+                    for (let i = 0; i < spikes * 2; i++) {
+                        const radius = i % 2 === 0 ? starOuter : starInner;
+                        const angle = (i * Math.PI) / spikes - Math.PI / 2;
+                        const px = x + radius * Math.cos(angle);
+                        const py = y + radius * Math.sin(angle);
+                        if (i === 0) {
+                            ctx.moveTo(px, py);
+                        } else {
+                            ctx.lineTo(px, py);
+                        }
+                    }
+                    break;
+                case 'heart':
+                    // Heart uses radial gradient (center outward) - converted from SVG path
+                    // SVG: "M16 28s-10-6-10-14c0-3 2-5 5-5 2 0 4 1 5 3 1-2 3-3 5-3 3 0 5 2 5 5 0 8-10 14-10 14z"
+                    // Base scale for SVG (3.5 is medium size) multiplied by size scale
+                    const scale = 3.5 * sizeScale;
+                    const heartGradientSize = 50 * sizeScale;
+
+                    if (currentColor === 'rainbow') {
+                        ctx.fillStyle = createRainbowGradient(x, y, heartGradientSize);
+                    } else {
+                        ctx.fillStyle = currentColor;
+                    }
+
+                    // Translate SVG coordinates (viewBox 0-32) to canvas centered at x,y
+                    // Original SVG center is around (16, 18), we want to center it at (x, y)
+                    const offsetX = x - 16 * scale;
+                    const offsetY = y - 18 * scale;
+
+                    // Start at bottom point: M16 28
+                    ctx.moveTo(offsetX + 16 * scale, offsetY + 28 * scale);
+
+                    // Smooth curve: s-10-6-10-14 (smooth bezier, relative)
+                    // This curves from bottom up to left side
+                    // Control point is relative to previous end point
+                    const cp1x = offsetX + (16 - 10) * scale;
+                    const cp1y = offsetY + (28 - 6) * scale;
+                    const p1x = offsetX + (16 - 10) * scale;
+                    const p1y = offsetY + (28 - 14) * scale;
+                    ctx.quadraticCurveTo(cp1x, cp1y, p1x, p1y);
+
+                    // Cubic bezier: c0-3 2-5 5-5 (left heart bump curve)
+                    const cp2x = p1x + 0;
+                    const cp2y = p1y - 3 * scale;
+                    const cp3x = p1x + 2 * scale;
+                    const cp3y = p1y - 5 * scale;
+                    const p2x = p1x + 5 * scale;
+                    const p2y = p1y - 5 * scale;
+                    ctx.bezierCurveTo(cp2x, cp2y, cp3x, cp3y, p2x, p2y);
+
+                    // Cubic bezier: 2 0 4 1 5 3 (curve to center top)
+                    const cp4x = p2x + 2 * scale;
+                    const cp4y = p2y + 0;
+                    const cp5x = p2x + 4 * scale;
+                    const cp5y = p2y + 1 * scale;
+                    const p3x = p2x + 5 * scale;
+                    const p3y = p2y + 3 * scale;
+                    ctx.bezierCurveTo(cp4x, cp4y, cp5x, cp5y, p3x, p3y);
+
+                    // Cubic bezier: 1-2 3-3 5-3 (curve to right bump top)
+                    const cp6x = p3x + 1 * scale;
+                    const cp6y = p3y - 2 * scale;
+                    const cp7x = p3x + 3 * scale;
+                    const cp7y = p3y - 3 * scale;
+                    const p4x = p3x + 5 * scale;
+                    const p4y = p3y - 3 * scale;
+                    ctx.bezierCurveTo(cp6x, cp6y, cp7x, cp7y, p4x, p4y);
+
+                    // Cubic bezier: 3 0 5 2 5 5 (right bump curve down)
+                    const cp8x = p4x + 3 * scale;
+                    const cp8y = p4y + 0;
+                    const cp9x = p4x + 5 * scale;
+                    const cp9y = p4y + 2 * scale;
+                    const p5x = p4x + 5 * scale;
+                    const p5y = p4y + 5 * scale;
+                    ctx.bezierCurveTo(cp8x, cp8y, cp9x, cp9y, p5x, p5y);
+
+                    // Cubic bezier: 0 8-10 14-10 14 (curve back to bottom)
+                    const cp10x = p5x + 0;
+                    const cp10y = p5y + 8 * scale;
+                    const cp11x = p5x - 10 * scale;
+                    const cp11y = p5y + 14 * scale;
+                    const p6x = p5x - 10 * scale;
+                    const p6y = p5y + 14 * scale;
+                    ctx.bezierCurveTo(cp10x, cp10y, cp11x, cp11y, p6x, p6y);
+
+                    // z (close path)
+                    ctx.closePath();
+                    break;
+                case 'smiley':
+                    // Face - scales with brush size
+                    const faceRadius = 40 * sizeScale;
+                    const eyeOffset = 12 * sizeScale;
+                    const eyeY = 8 * sizeScale;
+                    const eyeSize = 4 * sizeScale;
+                    const smileRadius = 20 * sizeScale;
+
+                    if (currentColor === 'rainbow') {
+                        ctx.fillStyle = createRainbowGradient(x, y, faceRadius + 10);
+                    } else {
+                        ctx.fillStyle = currentColor;
+                    }
+                    ctx.arc(x, y, faceRadius, 0, Math.PI * 2);
+                    ctx.fill();
+                    // Eyes
+                    ctx.fillStyle = '#000';
+                    ctx.beginPath();
+                    ctx.arc(x - eyeOffset, y - eyeY, eyeSize, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(x + eyeOffset, y - eyeY, eyeSize, 0, Math.PI * 2);
+                    ctx.fill();
+                    // Smile
+                    ctx.strokeStyle = '#000';
+                    ctx.lineWidth = 3 * sizeScale;
+                    ctx.beginPath();
+                    ctx.arc(x, y, smileRadius, 0.2 * Math.PI, 0.8 * Math.PI);
+                    ctx.stroke();
+                    return;
+                case 'hexagon':
+                    // Hexagon uses linear gradient (top to bottom)
+                    const hexSize = 35 * sizeScale;
+                    if (currentColor === 'rainbow') {
+                        ctx.fillStyle = createRainbowLinearGradient(x, y, hexSize);
+                    } else {
+                        ctx.fillStyle = currentColor;
+                    }
+                    for (let i = 0; i < 6; i++) {
+                        const angle = (Math.PI / 3) * i;
+                        const px = x + hexSize * Math.cos(angle);
+                        const py = y + hexSize * Math.sin(angle);
+                        if (i === 0) {
+                            ctx.moveTo(px, py);
+                        } else {
+                            ctx.lineTo(px, py);
+                        }
+                    }
+                    ctx.closePath();
+                    break;
+                case 'bunny':
+                    // Bunny uses radial gradient for head
+                    const bunnyScale = 2.5 * sizeScale;
+                    const headRadius = 8 * bunnyScale;
+                    const headY = 18 * bunnyScale;
+
+                    // Head
+                    if (currentColor === 'rainbow') {
+                        ctx.fillStyle = createRainbowGradient(x, y + headY - 18 * bunnyScale, headRadius);
+                    } else {
+                        ctx.fillStyle = currentColor;
+                    }
+                    ctx.beginPath();
+                    ctx.arc(x, y + headY - 18 * bunnyScale, headRadius, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#000';
+                    ctx.lineWidth = 1.5 * bunnyScale;
+                    ctx.stroke();
+
+                    // Left ear
+                    ctx.beginPath();
+                    ctx.ellipse(x - 4 * bunnyScale, y + 8 * bunnyScale - 18 * bunnyScale, 3 * bunnyScale, 7 * bunnyScale, 0, 0, Math.PI * 2);
+                    if (currentColor === 'rainbow') {
+                        ctx.fillStyle = createRainbowGradient(x - 4 * bunnyScale, y + 8 * bunnyScale - 18 * bunnyScale, 7 * bunnyScale);
+                    } else {
+                        ctx.fillStyle = currentColor;
+                    }
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Right ear
+                    ctx.beginPath();
+                    ctx.ellipse(x + 4 * bunnyScale, y + 8 * bunnyScale - 18 * bunnyScale, 3 * bunnyScale, 7 * bunnyScale, 0, 0, Math.PI * 2);
+                    if (currentColor === 'rainbow') {
+                        ctx.fillStyle = createRainbowGradient(x + 4 * bunnyScale, y + 8 * bunnyScale - 18 * bunnyScale, 7 * bunnyScale);
+                    } else {
+                        ctx.fillStyle = currentColor;
+                    }
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Left eye
+                    ctx.fillStyle = '#000';
+                    ctx.beginPath();
+                    ctx.arc(x - 3 * bunnyScale, y + 17 * bunnyScale - 18 * bunnyScale, 1.5 * bunnyScale, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Right eye
+                    ctx.beginPath();
+                    ctx.arc(x + 3 * bunnyScale, y + 17 * bunnyScale - 18 * bunnyScale, 1.5 * bunnyScale, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Nose
+                    ctx.fillStyle = '#FF69B4';
+                    ctx.beginPath();
+                    ctx.arc(x, y + 20 * bunnyScale - 18 * bunnyScale, 1 * bunnyScale, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Mouth (two curves)
+                    ctx.strokeStyle = '#000';
+                    ctx.lineWidth = 1 * bunnyScale;
+                    ctx.beginPath();
+                    ctx.moveTo(x, y + 20 * bunnyScale - 18 * bunnyScale);
+                    ctx.quadraticCurveTo(x - 2 * bunnyScale, y + 22 * bunnyScale - 18 * bunnyScale, x - 4 * bunnyScale, y + 21 * bunnyScale - 18 * bunnyScale);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(x, y + 20 * bunnyScale - 18 * bunnyScale);
+                    ctx.quadraticCurveTo(x + 2 * bunnyScale, y + 22 * bunnyScale - 18 * bunnyScale, x + 4 * bunnyScale, y + 21 * bunnyScale - 18 * bunnyScale);
+                    ctx.stroke();
+                    return;
+            }
+            ctx.fill();
+        }
+
+        // Mouse events
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseleave', stopDrawing);
+
+        // Touch events for future mobile support
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            startDrawing(e);
+        });
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            draw(e);
+        });
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            stopDrawing();
+        });
+
+        // Initialize cursor on page load
+        updateCursor();
+    </script>
+</body>
+</html>
