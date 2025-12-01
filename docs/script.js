@@ -500,13 +500,20 @@ function drawShape(x, y, shape) {
             const eyeSize = 4 * sizeScale;
             const smileRadius = 20 * sizeScale;
 
+            // Determine smiley color - use white if black is selected, otherwise use selected color
+            const smileyColor = currentColor === '#000000' ? '#FFFFFF' : currentColor;
+
             if (currentColor === 'rainbow') {
                 ctx.fillStyle = createRainbowGradient(x, y, faceRadius + 10);
             } else {
-                ctx.fillStyle = currentColor;
+                ctx.fillStyle = smileyColor;
             }
             ctx.arc(x, y, faceRadius, 0, Math.PI * 2);
             ctx.fill();
+            // Add black outline to face
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2 * sizeScale;
+            ctx.stroke();
             // Eyes
             ctx.fillStyle = '#000';
             ctx.beginPath();
