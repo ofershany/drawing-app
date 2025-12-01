@@ -12,6 +12,30 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
+// Mobile color panel toggle
+const colorToggle = document.getElementById('colorToggle');
+const colorPanel = document.getElementById('colorPanel');
+
+if (colorToggle) {
+    colorToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        colorPanel.classList.toggle('show');
+        colorToggle.classList.toggle('active');
+    });
+
+    // Close color panel when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!colorPanel.contains(e.target) && e.target !== colorToggle) {
+            colorPanel.classList.remove('show');
+            colorToggle.classList.remove('active');
+        }
+    });
+
+    colorPanel.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+}
+
 // Drawing state
 let isDrawing = false;
 let currentTool = 'pen';
@@ -177,6 +201,11 @@ document.querySelectorAll('.color-btn').forEach(btn => {
         currentColor = btn.dataset.color;
         // Update cursor to reflect new color
         updateCursor();
+        // Close color panel on mobile after selection
+        if (colorPanel && colorToggle) {
+            colorPanel.classList.remove('show');
+            colorToggle.classList.remove('active');
+        }
     });
 });
 

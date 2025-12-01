@@ -117,19 +117,25 @@
             </div>
         </div>
 
-        <div class="separator"></div>
+        <div class="separator mobile-hide"></div>
 
-        <button class="color-btn active" data-color="#FF0000" style="background: #FF0000;" title="Red"></button>
-        <button class="color-btn" data-color="#FF6B00" style="background: #FF6B00;" title="Orange"></button>
-        <button class="color-btn" data-color="#FFD700" style="background: #FFD700;" title="Yellow"></button>
-        <button class="color-btn" data-color="#00FF00" style="background: #00FF00;" title="Green"></button>
-        <button class="color-btn" data-color="#0080FF" style="background: #0080FF;" title="Blue"></button>
-        <button class="color-btn" data-color="#A020F0" style="background: #A020F0;" title="Purple"></button>
-        <button class="color-btn" data-color="#FF69B4" style="background: #FF69B4;" title="Pink"></button>
-        <button class="color-btn" data-color="#000000" style="background: #000000;" title="Black"></button>
-        <button class="color-btn" data-color="rainbow" style="background: linear-gradient(90deg, #FF0000, #FF7F00, #FFFF00, #00FF00, #0000FF, #4B0082, #9400D3);" title="Rainbow"></button>
+        <!-- Color palette - desktop shows all, mobile collapses -->
+        <div class="mobile-collapse-section">
+            <button class="mobile-toggle-btn" id="colorToggle" title="Colors">🎨</button>
+            <div class="mobile-collapse-content" id="colorPanel">
+                <button class="color-btn active" data-color="#FF0000" style="background: #FF0000;" title="Red"></button>
+                <button class="color-btn" data-color="#FF6B00" style="background: #FF6B00;" title="Orange"></button>
+                <button class="color-btn" data-color="#FFD700" style="background: #FFD700;" title="Yellow"></button>
+                <button class="color-btn" data-color="#00FF00" style="background: #00FF00;" title="Green"></button>
+                <button class="color-btn" data-color="#0080FF" style="background: #0080FF;" title="Blue"></button>
+                <button class="color-btn" data-color="#A020F0" style="background: #A020F0;" title="Purple"></button>
+                <button class="color-btn" data-color="#FF69B4" style="background: #FF69B4;" title="Pink"></button>
+                <button class="color-btn" data-color="#000000" style="background: #000000;" title="Black"></button>
+                <button class="color-btn" data-color="rainbow" style="background: linear-gradient(90deg, #FF0000, #FF7F00, #FFFF00, #00FF00, #0000FF, #4B0082, #9400D3);" title="Rainbow"></button>
+            </div>
+        </div>
 
-        <div class="separator"></div>
+        <div class="separator mobile-hide"></div>
 
         <button class="tool-btn clear-btn" id="clearBtn" title="Clear Canvas">🗑️<br>Clear</button>
     </div>
