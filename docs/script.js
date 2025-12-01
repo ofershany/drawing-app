@@ -568,7 +568,7 @@ function drawShape(x, y, shape) {
             ctx.arc(x, y + headY - 18 * bunnyScale, headRadius, 0, Math.PI * 2);
             ctx.fill();
             ctx.strokeStyle = '#000';
-            ctx.lineWidth = 1.5 * bunnyScale;
+            ctx.lineWidth = 0.8 * bunnyScale;
             ctx.stroke();
 
             // Left ear
