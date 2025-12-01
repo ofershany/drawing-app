@@ -548,11 +548,14 @@ function drawShape(x, y, shape) {
             const headRadius = 8 * bunnyScale;
             const headY = 18 * bunnyScale;
 
+            // Determine bunny color - use white if black is selected, otherwise use selected color
+            const bunnyColor = currentColor === '#000000' ? '#FFFFFF' : currentColor;
+
             // Head
             if (currentColor === 'rainbow') {
                 ctx.fillStyle = createRainbowGradient(x, y + headY - 18 * bunnyScale, headRadius);
             } else {
-                ctx.fillStyle = currentColor;
+                ctx.fillStyle = bunnyColor;
             }
             ctx.beginPath();
             ctx.arc(x, y + headY - 18 * bunnyScale, headRadius, 0, Math.PI * 2);
@@ -567,7 +570,7 @@ function drawShape(x, y, shape) {
             if (currentColor === 'rainbow') {
                 ctx.fillStyle = createRainbowGradient(x - 4 * bunnyScale, y + 8 * bunnyScale - 18 * bunnyScale, 7 * bunnyScale);
             } else {
-                ctx.fillStyle = currentColor;
+                ctx.fillStyle = bunnyColor;
             }
             ctx.fill();
             ctx.stroke();
@@ -578,7 +581,7 @@ function drawShape(x, y, shape) {
             if (currentColor === 'rainbow') {
                 ctx.fillStyle = createRainbowGradient(x + 4 * bunnyScale, y + 8 * bunnyScale - 18 * bunnyScale, 7 * bunnyScale);
             } else {
-                ctx.fillStyle = currentColor;
+                ctx.fillStyle = bunnyColor;
             }
             ctx.fill();
             ctx.stroke();
