@@ -9,6 +9,9 @@ on:
       - 'docs/styles.css'
       - 'docs/index.html'
 
+permissions:
+  contents: write
+
 jobs:
   update-version:
     runs-on: ubuntu-latest
