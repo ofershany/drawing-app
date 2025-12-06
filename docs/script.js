@@ -712,3 +712,4 @@ canvas.addEventListener('touchend', (e) => {
 updateCursor();
 
 // Test cache bust workflow
+// Test permissions fix
