@@ -710,6 +710,3 @@ canvas.addEventListener('touchend', (e) => {
 
 // Initialize cursor on page load
 updateCursor();
-
-// Test cache bust workflow
-// Test permissions fix
