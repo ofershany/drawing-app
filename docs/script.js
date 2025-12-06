@@ -43,6 +43,71 @@ let currentColor = '#FF0000';
 let brushSize = 12; // Medium is the default
 let currentShape = 'star';
 
+// OpenMoji stamp SVG templates (original colors)
+const stampTemplates = {
+    bunny: {
+        svg: '<svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg"><path fill="MAIN_COLOR" d="m30.921,28.0021s3.8009-4.523,10.1088.4052l-.6097,11.5103,3.9176,6.0845s4.5833,5.503,4.8333,6.2515,1.75,7.9151,1.5833,8.2485c-.1667.3333-4.5149,5.4097-4.5149,5.4097h-20.1851l-3.3-4.8928.5833-11.1003,5.5833-5.1667,2.8333-7-.8332-9.7499Z"/><path fill="#3f3f3f" d="m39.7544,27.7521s-4.8333,14.8333,4.6667,21.6667c0,0,8.3333,7.6667.1667,17l5.5334-1.4188,3.2271-2.5623c.5819-.462,1.0198-1.0805,1.2624-1.7828l1.2097-3.503c.1869-.5412.2771-1.1073.2651-1.6798-.0244-1.166-.1073-3.1664-.3878-3.9766-1.6508-4.7696-5.7766-8.5767-5.7766-8.5767,0,0-2.8333-2.8333.1667-5.5l5.4319-6.7592c.3966-.4935.7615-1.0116,1.0926-1.5513l4.3088-7.0229,2.0447-7.2442.2096-8.0482-3.0876-1.041-5.6667,1-5.8333,5-4,6.1667-2.6667,6.3333-2.1668,3.4999Z"/><path fill="#3f3f3f" d="m32.1082,27.7521s4.8333,14.8333-4.6667,21.6667c0,0-8.3333,7.6667-.1667,17l-4.8289-1.4382c-.6515-.194-1.2579-.5161-1.7835-.9472l-2.0427-1.6754c-.388-.3182-.6961-.7228-.8997-1.1815l-1.4937-3.3652c-.3046-.6863-.4222-1.438-.3412-2.1845.1361-1.2547.3649-3.1969.5584-4.0234.5508-2.3521,5.4979-8.6846,5.4979-8.6846,0,0,2.8333-2.8333-.1667-5.5l-6.1002-7.0634-4.7331-8.2699-2.0964-7.1858-.9278-8.1831,3.8575-.9644,5.6465,1.0693,5.8535,4.9307,4,6.1667,2.6667,6.3333,2.1668,3.4999Z"/><polyline fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" points="41.0298 50.553 35.8398 53.9543 30.5638 50.553"/><polyline fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" points="31.3767 61.0191 35.7968 58.9868 40.4201 61.0191"/><line x1="35.8398" x2="35.7968" y1="53.9543" y2="58.9868" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><ellipse cx="45.1214" cy="39.9176" rx="1.6461" ry="2.8119"/><ellipse cx="26.8786" cy="39.9176" rx="1.6461" ry="2.8119"/></svg>',
+        mainColor: '#fff'
+    },
+    butterfly: {
+        svg: '<svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg"><path fill="MAIN_COLOR" d="m35.892 22.845c-1.1677-0.75117-2.3515-1.5127-4.2562-2.536-1.9047-1.0233-4.5628-2.3295-7.3719-3.0366-2.8091-0.70712-5.7684-0.81539-8.9995-0.92767-3.2311-0.11228-6.7338-0.22857-8.7991 0.71011s-2.694 2.9321-0.63572 6.7601 6.8063 9.4959 11.128 11.07 8.2242-0.93837 11.039-2.5076c2.8152-1.5692 4.5425-2.1943 6.2711-2.8198"/><path fill="MAIN_COLOR" d="m32.103 44.066c-0.75813 3.7545-1.516 7.5079-3.6638 9.4562-2.1478 1.9483-5.6846 2.0927-7.9036-0.93857-2.219-3.0312-3.1212-9.2385-2.4695-12.725 0.65167-3.4868 2.8607-4.2531 5.602-5.4795 2.7413-1.2264 6.0204-2.9151 9.3011-4.6046z"/><path fill="MAIN_COLOR" d="m36.108 22.845c1.1677-0.75117 2.3515-1.5127 4.2562-2.536 1.9047-1.0233 4.5628-2.3295 7.3719-3.0366 2.8091-0.70712 5.7684-0.81539 8.9995-0.92767 3.2311-0.11228 6.7338-0.22857 8.7992 0.71041 2.0654 0.93898 2.6939 2.9319 0.63551 6.76-2.0584 3.8281-6.8031 9.492-11.126 11.068-4.3233 1.576-8.226-0.93668-11.041-2.5058-2.815-1.5691-4.5423-2.1941-6.2708-2.8196"/><path fill="MAIN_COLOR" d="m39.897 44.066c0.75813 3.7545 1.516 7.5079 3.6638 9.4562 2.1478 1.9483 5.6846 2.0927 7.9036-0.93857 2.219-3.0312 3.1212-9.2385 2.4697-12.725-0.65148-3.4867-2.8579-4.2521-5.6008-5.4791-2.7429-1.227-6.022-2.9157-9.3024-4.605 z"/><ellipse cx="35.807" cy="17.922" rx="3.5601" ry="2.6701" fill="#9B9B9A"/><ellipse cx="35.819" cy="23.563" rx="3.353" ry="2.7346" fill="#3F3F3F"/><path fill="#9B9B9A" d="m35.394 26.812c-6.3212 0.67634 0.6061 20.481 0.6061 20.481s7.8636-21.387-0.6061-20.481z"/><path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m32.103 44.066c-0.75813 3.7545-1.516 7.5079-3.6638 9.4562-2.1478 1.9483-5.6846 2.0927-7.9036-0.93857-2.219-3.0312-3.1212-9.2385-2.4695-12.725 0.65167-3.4868 2.8581-4.2522 5.0655-5.0179"/><ellipse cx="36" cy="17.922" rx="3.5601" ry="2.6701" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><ellipse cx="36" cy="23.563" rx="3.353" ry="2.7346" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m35.392 26.812c-6.3212 0.67634 0.60836 20.481 0.60836 20.481s7.8614-21.387-0.60836-20.481z"/><line x1="37.968" x2="39.452" y1="14.845" y2="11.582" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><line x1="34.032" x2="32.548" y1="14.845" y2="11.582" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>',
+        mainColor: '#92D3F5'
+    },
+    cat: {
+        svg: '<svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg"><path fill="MAIN_COLOR" d="m58.2673,11.3469s-10.4076,2.3754-15.5743,6.7088c0,0-9-2.5-13.8333.1667,0,0-9.6549-6.7318-15.6549-6.7318,0,0-5.0326,3.75.3216,21.0651,0,0-2.6667,10.6667,1.6667,16.3333.7823,1.023,1.6026,1.9862,2.4217,2.8779,3.4268,3.7306,7.5912,6.7046,12.1937,8.8205l1.696.7797c1.5277.7023,3.1777,1.1,4.8576,1.1707h0c.9304.0392,1.8573-.1359,2.7093-.5118l4.5429-2.0042c3.8082-1.6801,7.2734-4.0872,10.0486-7.1894,1.1585-1.295,2.2135-2.71,2.8635-4.11,4.4736-10.6191,1.5314-16.2624,1.5314-16.2624l1.2356-7.1292c.8094-3.1482.8268-6.4477.0506-9.6043l-1.0768-4.3796Z"/><path fill="#fff" d="m30.8377,47.3355s-7.3487,2.8338-1.0987,9.3338c0,0-1.6971,4.2984,3.5271,4.6285.6823.0431,2.7339.0635,2.7339.0635l1.5797.0367c.4833.0112.9656-.0228,1.4424-.1026,1.8709-.3132,3.9279-.7821,3.181-4.5878,0,0,7.5513-6.3722-1.3654-9.3722l-4.875,2-5.125-1.9999Z"/><ellipse cx="45.0854" cy="38.1033" rx="1.6461" ry="2.8119"/><ellipse cx="26.8427" cy="38.1033" rx="1.6461" ry="2.8119"/><polyline fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" points="31.9328 47.2287 36.037 50.0204 39.8495 47.2287"/><path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m36.037,50.0204v4.2708s-1.1042,3.6875-5.5417,2.875"/><path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m35.8911,49.8767v4.2708s1.1042,3.6875,5.5417,2.875"/></svg>',
+        mainColor: '#f4aa41'
+    },
+    car: {
+        svg: '<svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg"><path fill="MAIN_COLOR" d="M64.8,44l-1.1-0.6c-0.4-0.2-0.6-0.6-0.5-1c0.3-1.9,0.5-8.5-9.7-11.5c-0.2-0.1-0.4-0.1-0.6-0.1l-19.6,0.1 c-0.4,0-0.8,0.1-1.1,0.3l-10.3,6.9c-0.2,0.1-0.4,0.2-0.6,0.2c-1.9-0.1-3.7,0.1-5.6,0.4c-5.4,1.1-7.6,4-8.4,5.5 c-0.2,0.3-0.2,0.7-0.2,1c0.1,2.4-1.5,5.1,0.9,7.3l19.4-0.1l20.4-0.5l16.1-0.2c0.9-0.1001,2.4-1.4,2.8-2.2001 C68.4,46.8,65,44.1,64.8,44z"/><path fill="#9b9b9a" d="M17.3,46.4c-2.2,0-4,1.8-4,4c0,2.2,1.8,4,4,4s4-1.8,4-4C21.3,48.2,19.5,46.4,17.3,46.4z"/><path fill="#9b9b9a" d="M57.1,46.4c-2.2,0-4,1.8-4,4c0,2.2,1.8,4,4,4c2.2,0,4-1.8,4-4C61.1,48.2,59.3,46.4,57.1,46.4z"/><path fill="#92d3f5" d="M56.1,39.3V35c0-0.9-0.8-1.7-1.7-1.7l0,0H33.2c-0.1,0-0.2,0-0.2,0.1l-8,5.7c-0.2,0.1-0.2,0.4-0.1,0.6 c0.1,0.1,0.2,0.2,0.3,0.2c5.6,0,27.2-0.2,30.4-0.1C55.9,39.8,56.1,39.6,56.1,39.3C56.1,39.4,56.1,39.4,56.1,39.3z"/><polygon fill="#fcea2b" points="8.9,40.5 12.9,42.1 10.8,45 5.8,45.1"/><line x1="47.6" x2="27" y1="51" y2="51.4" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><circle cx="17.3" cy="50.4" r="5" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><circle cx="57.1" cy="50.4" r="5" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>',
+        mainColor: '#ea5a47'
+    },
+    flower: {
+        svg: '<svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg"><path fill="MAIN_COLOR" d="M53.1986,26.1283c-0.2578-0.3518-0.2578-0.8302,0-1.182l0.781-1.066 c1.7236-2.3562,1.2108-5.6636-1.1455-7.3873c-1.0641-0.7784-2.3808-1.1311-3.6915-0.9887l-1.313,0.143 c-0.4329,0.0447-0.8455-0.1936-1.023-0.591l-0.533-1.208c-1.1787-2.6708-4.2994-3.8805-6.9702-2.7018 c-1.206,0.5322-2.1696,1.4958-2.7018,2.7018l-0.533,1.209c-0.1785,0.3963-0.5906,0.6339-1.023,0.59l-1.313-0.143 c-2.9024-0.3146-5.5102,1.7833-5.8248,4.6857c-0.142,1.3104,0.2106,2.6265,0.9888,3.6903l0.781,1.066 c0.2578,0.3518,0.2578,0.8302,0,1.182l-0.78,1.066c-1.7242,2.3551-1.2128,5.6621,1.1423,7.3863 c1.0645,0.7794,2.3821,1.1324,3.6937,0.9897l1.313-0.143c0.4331-0.0472,0.8469,0.1915,1.023,0.59l0.533,1.208 c0.1352,0.2987,0.2972,0.5845,0.484,0.854c0.043,0.063,0.088,0.122,0.133,0.182c0.1707,0.2319,0.3604,0.4494,0.567,0.65 c0.019,0.019,0.037,0.039,0.056,0.057c0.5022,0.4685,1.0932,0.8316,1.738,1.068l0,0c0.5941,0.2236,1.2233,0.3394,1.858,0.342 c2.0993,0.0169,4.0045-1.2253,4.836-3.153l0.533-1.208c0.1757-0.3989,0.5896-0.638,1.023-0.591l1.313,0.143 c2.9023,0.3152,5.5106-1.7821,5.8258-4.6845c0.1423-1.3108-0.2103-2.6274-0.9888-3.6915L53.1986,26.1283z"/><path fill="#5C9E31" d="M10.0786,28.3983c-0.151,2.092-0.178,7.231,2.687,10.738s7.906,4.508,9.985,4.774 c0.151-2.092,0.178-7.232-2.687-10.738l0,0C17.1886,29.6553,12.1556,28.6643,10.0786,28.3983z"/><circle cx="41.4376" cy="25.5373" r="5" fill="#F1B31C" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.8366,32.5393 c3.992,4.886,2.805,12.462,2.805,12.462s-7.66-0.347-11.653-5.233s-2.805-12.462-2.805-12.462S16.8436,27.6533,20.8366,32.5393z"/></svg>',
+        mainColor: '#FCEA2B'
+    }
+};
+
+// Current colored stamp images
+const stampImages = {};
+
+// Generate colored stamp SVG
+function getColoredStampSVG(stampName, color) {
+    const template = stampTemplates[stampName];
+    if (!template) return null;
+
+    // If rainbow is selected, use original color (rainbow only works for continuous drawing)
+    const fillColor = (color === 'rainbow') ? template.mainColor : color;
+
+    return template.svg.replace(/MAIN_COLOR/g, fillColor);
+}
+
+// Load stamp image for a specific color
+function loadStampImage(stampName, color) {
+    const coloredSvg = getColoredStampSVG(stampName, color);
+    if (!coloredSvg) return null;
+
+    const img = new Image();
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(coloredSvg);
+    return img;
+}
+
+// Initialize stamps with current default color
+function initializeStamps() {
+    Object.keys(stampTemplates).forEach(key => {
+        stampImages[key] = loadStampImage(key, currentColor);
+    });
+}
+
+// Update all stamp images when color changes
+function updateStampColors(color) {
+    Object.keys(stampTemplates).forEach(key => {
+        stampImages[key] = loadStampImage(key, color);
+    });
+}
+
+// Initialize stamps on page load
+initializeStamps();
+
 // Rainbow colors
 const rainbowColors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#9400D3'];
 let currentRainbowColor = rainbowColors[0];
@@ -151,13 +216,18 @@ function createShapeCursor(shape) {
             shapeContent = `<path d='M16 4l8 4.5v9L16 22l-8-4.5v-9z' fill='#A020F0' stroke='#000' stroke-width='1.5'/>`;
             break;
         case 'bunny':
-            shapeContent = `<circle cx='16' cy='18' r='8' fill='#FFF' stroke='#000' stroke-width='1'/>
-                <ellipse cx='12' cy='8' rx='3' ry='7' fill='#FFF' stroke='#000' stroke-width='1'/>
-                <ellipse cx='20' cy='8' rx='3' ry='7' fill='#FFF' stroke='#000' stroke-width='1'/>
-                <circle cx='13' cy='17' r='1.5' fill='#000'/>
-                <circle cx='19' cy='17' r='1.5' fill='#000'/>
-                <circle cx='16' cy='20' r='1' fill='#FF69B4'/>
-                <path d='M16 20 Q14 22 12 21 M16 20 Q18 22 20 21' stroke='#000' stroke-width='1' fill='none' stroke-linecap='round'/>`;
+        case 'butterfly':
+        case 'cat':
+        case 'car':
+        case 'flower':
+            // For OpenMoji stamps, generate colored cursor SVG
+            const cursorSvg = getColoredStampSVG(shape, currentColor);
+            if (cursorSvg) {
+                // Scale down the SVG content for cursor
+                shapeContent = `<g transform='scale(0.44)'>${cursorSvg.match(/<svg[^>]*>(.*)<\/svg>/s)[1]}</g>`;
+            } else {
+                shapeContent = `<circle cx='${center}' cy='${center}' r='10' fill='#FF6B00' stroke='#000' stroke-width='1.5'/>`;
+            }
             break;
         default:
             shapeContent = `<circle cx='${center}' cy='${center}' r='10' fill='#FF6B00' stroke='#000' stroke-width='1.5'/>`;
@@ -199,6 +269,8 @@ document.querySelectorAll('.color-btn').forEach(btn => {
         document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         currentColor = btn.dataset.color;
+        // Update stamp colors when color changes
+        updateStampColors(currentColor);
         // Update cursor to reflect new color
         updateCursor();
         // Close color panel on mobile after selection
@@ -277,7 +349,10 @@ document.querySelectorAll('.shape-option').forEach(option => {
         currentTool = 'shape';
 
         // Update the current shape icon
-        currentShapeIcon.innerHTML = option.querySelector('svg').innerHTML;
+        const sourceSvg = option.querySelector('svg');
+        currentShapeIcon.innerHTML = sourceSvg.innerHTML;
+        // Update viewBox to match the source SVG so content fits properly
+        currentShapeIcon.setAttribute('viewBox', sourceSvg.getAttribute('viewBox'));
 
         // Mark shape button as active
         document.querySelectorAll('.tool-btn[data-tool]').forEach(b => b.classList.remove('active'));
@@ -294,6 +369,26 @@ document.querySelectorAll('.shape-option').forEach(option => {
 document.getElementById('clearBtn').addEventListener('click', () => {
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+});
+
+// Info button and modal
+const aboutModal = document.getElementById('aboutModal');
+const modalClose = document.getElementById('modalClose');
+
+document.getElementById('infoBtn').addEventListener('click', () => {
+    aboutModal.classList.add('show');
+});
+
+// Close modal when clicking X
+modalClose.addEventListener('click', () => {
+    aboutModal.classList.remove('show');
+});
+
+// Close modal when clicking outside the modal content
+aboutModal.addEventListener('click', (e) => {
+    if (e.target === aboutModal) {
+        aboutModal.classList.remove('show');
+    }
 });
 
 // Drawing functions
@@ -579,77 +674,15 @@ function drawShape(x, y, shape) {
             ctx.closePath();
             break;
         case 'bunny':
-            // Bunny uses radial gradient for head
-            const bunnyScale = 2.5 * sizeScale;
-            const headRadius = 8 * bunnyScale;
-            const headY = 18 * bunnyScale;
-
-            // Determine bunny color - use white if black is selected, otherwise use selected color
-            const bunnyColor = currentColor === '#000000' ? '#FFFFFF' : currentColor;
-
-            // Head
-            if (currentColor === 'rainbow') {
-                ctx.fillStyle = createRainbowGradient(x, y + headY - 18 * bunnyScale, headRadius);
-            } else {
-                ctx.fillStyle = bunnyColor;
+        case 'butterfly':
+        case 'cat':
+        case 'car':
+        case 'flower':
+            // OpenMoji stamps - drawn as images
+            if (stampImages[shape] && stampImages[shape].complete) {
+                const stampSize = 60 * sizeScale; // Base size scaled by brush size
+                ctx.drawImage(stampImages[shape], x - stampSize / 2, y - stampSize / 2, stampSize, stampSize);
             }
-            ctx.beginPath();
-            ctx.arc(x, y + headY - 18 * bunnyScale, headRadius, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.strokeStyle = '#000';
-            ctx.lineWidth = 0.8 * bunnyScale;
-            ctx.stroke();
-
-            // Left ear
-            ctx.beginPath();
-            ctx.ellipse(x - 4 * bunnyScale, y + 8 * bunnyScale - 18 * bunnyScale, 3 * bunnyScale, 7 * bunnyScale, 0, 0, Math.PI * 2);
-            if (currentColor === 'rainbow') {
-                ctx.fillStyle = createRainbowGradient(x - 4 * bunnyScale, y + 8 * bunnyScale - 18 * bunnyScale, 7 * bunnyScale);
-            } else {
-                ctx.fillStyle = bunnyColor;
-            }
-            ctx.fill();
-            ctx.stroke();
-
-            // Right ear
-            ctx.beginPath();
-            ctx.ellipse(x + 4 * bunnyScale, y + 8 * bunnyScale - 18 * bunnyScale, 3 * bunnyScale, 7 * bunnyScale, 0, 0, Math.PI * 2);
-            if (currentColor === 'rainbow') {
-                ctx.fillStyle = createRainbowGradient(x + 4 * bunnyScale, y + 8 * bunnyScale - 18 * bunnyScale, 7 * bunnyScale);
-            } else {
-                ctx.fillStyle = bunnyColor;
-            }
-            ctx.fill();
-            ctx.stroke();
-
-            // Left eye
-            ctx.fillStyle = '#000';
-            ctx.beginPath();
-            ctx.arc(x - 3 * bunnyScale, y + 17 * bunnyScale - 18 * bunnyScale, 1.5 * bunnyScale, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Right eye
-            ctx.beginPath();
-            ctx.arc(x + 3 * bunnyScale, y + 17 * bunnyScale - 18 * bunnyScale, 1.5 * bunnyScale, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Nose
-            ctx.fillStyle = '#FF69B4';
-            ctx.beginPath();
-            ctx.arc(x, y + 20 * bunnyScale - 18 * bunnyScale, 1 * bunnyScale, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Mouth (two curves)
-            ctx.strokeStyle = '#000';
-            ctx.lineWidth = 1 * bunnyScale;
-            ctx.beginPath();
-            ctx.moveTo(x, y + 20 * bunnyScale - 18 * bunnyScale);
-            ctx.quadraticCurveTo(x - 2 * bunnyScale, y + 22 * bunnyScale - 18 * bunnyScale, x - 4 * bunnyScale, y + 21 * bunnyScale - 18 * bunnyScale);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(x, y + 20 * bunnyScale - 18 * bunnyScale);
-            ctx.quadraticCurveTo(x + 2 * bunnyScale, y + 22 * bunnyScale - 18 * bunnyScale, x + 4 * bunnyScale, y + 21 * bunnyScale - 18 * bunnyScale);
-            ctx.stroke();
             return;
     }
     ctx.fill();
