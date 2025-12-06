@@ -1,0 +1,49 @@
+name: Cache Bust Assets
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/script.js'
+      - 'docs/styles.css'
+      - 'docs/index.html'
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update version hash
+        run: |
+          # Get short commit hash
+          VERSION=$(git rev-parse --short HEAD)
+
+          # Update version in index.html
+          sed -i "s/styles\.css?v=[^\"']*/styles.css?v=$VERSION/g" docs/index.html
+          sed -i "s/script\.js?v=[^\"']*/script.js?v=$VERSION/g" docs/index.html
+
+          echo "Updated version to: $VERSION"
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet docs/index.html; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push if changed
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add docs/index.html
+          git commit -m "chore: update asset version to $(git rev-parse --short HEAD)"
+          git push
