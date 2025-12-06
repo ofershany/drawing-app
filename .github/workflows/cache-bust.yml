@@ -1,19 +1,17 @@
-name: Cache Bust Assets
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'docs/script.js'
-      - 'docs/styles.css'
-      - 'docs/index.html'
+      - 'docs/**'
 
 permissions:
   contents: write
 
 jobs:
-  update-version:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -33,20 +31,24 @@ jobs:
 
           echo "Updated version to: $VERSION"
 
-      - name: Check for changes
-        id: check_changes
-        run: |
-          if git diff --quiet docs/index.html; then
-            echo "changed=false" >> $GITHUB_OUTPUT
-          else
-            echo "changed=true" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Commit and push if changed
-        if: steps.check_changes.outputs.changed == 'true'
+      - name: Deploy to gh-pages
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add docs/index.html
-          git commit -m "chore: update asset version to $(git rev-parse --short HEAD)"
-          git push
+
+          # Create gh-pages branch if it doesn't exist, or check it out
+          git fetch origin gh-pages || git checkout --orphan gh-pages
+          git checkout gh-pages 2>/dev/null || git checkout --orphan gh-pages
+
+          # Remove everything except docs folder
+          git rm -rf . 2>/dev/null || true
+
+          # Copy docs contents to root
+          git checkout main -- docs/
+          mv docs/* .
+          rmdir docs
+
+          # Commit and push
+          git add .
+          git commit -m "Deploy from main@$(git rev-parse --short main)" || echo "No changes to deploy"
+          git push origin gh-pages --force
