@@ -421,11 +421,14 @@ function startDrawing(e) {
 
         lastPos = {x: pos.x, y: pos.y};
     } else if (currentTool === 'shape') {
+        isDrawing = true;
         drawShape(pos.x, pos.y, currentShape);
+        lastStampPos = {x: pos.x, y: pos.y};
     }
 }
 
 let lastPos = null;
+let lastStampPos = null;
 
 function draw(e) {
     if (!isDrawing) return;
@@ -471,12 +474,32 @@ function draw(e) {
         ctx.lineJoin = 'round';
         ctx.lineTo(pos.x, pos.y);
         ctx.stroke();
+    } else if (currentTool === 'shape') {
+        // Continuous stamping while dragging
+        if (lastStampPos) {
+            const dx = pos.x - lastStampPos.x;
+            const dy = pos.y - lastStampPos.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            // Calculate minimum spacing based on stamp size
+            // Base stamp size is 60-80px scaled by brushSize/12
+            const sizeScale = brushSize / 12;
+            const stampSize = 80 * sizeScale; // Use largest dimension for spacing
+            const minSpacing = stampSize * 0.8; // 80% of stamp size to prevent overlap
+
+            // Only draw a new stamp if we've moved far enough
+            if (distance >= minSpacing) {
+                drawShape(pos.x, pos.y, currentShape);
+                lastStampPos = {x: pos.x, y: pos.y};
+            }
+        }
     }
 }
 
 function stopDrawing() {
     isDrawing = false;
     lastPos = null;
+    lastStampPos = null;
 }
 
 function getMousePos(e) {
