@@ -25,11 +25,17 @@ Simply double-click `index.html` - no server, no installation, no dependencies n
 
 ## Architecture
 
-The entire application is contained in a single `index.html` file with three sections:
+The application is split into two main files in the `docs/` directory:
 
-1. **CSS Styles** (lines 7-163): All styling inline in `<style>` tag
-2. **HTML Structure** (lines 165-209): Toolbar and canvas elements
-3. **JavaScript Logic** (lines 211-381): Canvas drawing implementation
+1. **docs/index.html**: HTML structure with inline CSS styling
+   - All styling in `<style>` tag
+   - Toolbar with tool buttons, color palette, size controls, and shape dropdown menu
+   - Canvas element for drawing
+
+2. **docs/script.js**: JavaScript implementation
+   - Stamp templates with SVG definitions
+   - Canvas drawing logic
+   - Event handlers for mouse and touch interaction
 
 ### State Management
 
@@ -44,17 +50,23 @@ All application state is managed with simple JavaScript variables (lines 226-230
 The app uses HTML5 Canvas API with two drawing modes:
 
 1. **Continuous drawing** (pen/eraser): Uses path-based drawing with `beginPath()`, `moveTo()`, and `lineTo()`
-2. **Shape stamping** (circle/square/star): Single-click placement using fill methods
+2. **Stamp system**: Single-click or continuous stamping for shapes and images
+   - SVG-based stamps stored in `stampTemplates` object with `MAIN_COLOR` placeholder for dynamic coloring
+   - Stamps are pre-rendered as images with the current color using Data URLs
+   - All stamps support brush size scaling
+   - Most stamps sourced from OpenMoji (open-source emoji library, CC BY-SA 4.0)
 
 **Important implementation details:**
-- Eraser works by drawing white strokes at 2x the brush size (line 304)
-- Canvas resizes dynamically with window (lines 216-224)
-- Touch events already implemented for mobile support (lines 369-380)
+- Eraser works by drawing white strokes at 2x the brush size
+- Canvas resizes dynamically with window
+- Touch events already implemented for mobile support
+- Stamps support continuous stamping mode for repeated placement while dragging
 
 ### Tool Button System
 
 All interactive elements use data attributes for configuration:
-- Tools: `data-tool="pen|eraser|circle|square|star"`
+- Tools: `data-tool="pen|eraser"`
+- Shapes/Stamps: `data-shape="circle|square|star|bunny|butterfly|cat|car|flower|thumbsup|thumbsdown|menorah|starofdavid|candle|gift"`
 - Colors: `data-color="#RRGGBB"`
 - Sizes: `data-size="4|8|16"`
 
@@ -63,9 +75,15 @@ Active states are managed by toggling `.active` class, which applies golden bord
 ## Current Features
 
 - **Drawing tools:** Pen (freehand), Eraser
-- **Shapes:** Circle (40px radius), Square (80px), Star (5-pointed, 45px outer radius)
+- **Stamps:**
+  - Basic shapes: Circle, Square, Star
+  - Animals: Bunny, Butterfly, Cat (OpenMoji)
+  - Objects: Car, Flower (OpenMoji)
+  - Reactions: Thumbs Up, Thumbs Down (custom design)
+  - Hanukkah: Menorah, Star of David, Candle, Gift (OpenMoji)
 - **Colors:** 8 colors (Red, Orange, Yellow, Green, Blue, Purple, Pink, Black)
 - **Brush sizes:** Small (4px), Medium (8px - default), Large (16px)
+- **Continuous stamping:** Hold and drag to repeatedly stamp shapes
 - **Clear canvas button**
 - **Touch support** for tablets/phones (Android-ready)
 
@@ -73,9 +91,17 @@ Active states are managed by toggling `.active` class, which applies golden bord
 
 Per README.md, future features to consider:
 - Save/load drawings
-- More shapes (triangle, heart)
+- More stamps (seasonal themes, additional animals, etc.)
 - Undo/Redo functionality
 - Background colors/patterns
+
+## Stamp System
+
+Stamps use SVG templates with a color replacement system:
+- Each stamp has an SVG definition in the `stampTemplates` object
+- SVG uses `MAIN_COLOR` placeholder which gets replaced with the current color
+- Stamps are converted to Image objects for fast rendering on canvas
+- Sources: OpenMoji (CC BY-SA 4.0) for most stamps, custom designs for thumbs
 
 ## Styling Conventions
 
@@ -87,7 +113,13 @@ Per README.md, future features to consider:
 ## When Adding New Features
 
 - Maintain large button sizes (minimum 50x50px) for child usability
-- Keep all code in the single `index.html` file unless complexity requires separation
-- Use data attributes for tool/color/size configuration
+- HTML goes in `docs/index.html`, JavaScript in `docs/script.js`
+- Use data attributes for tool/color/size/shape configuration
 - Ensure touch event support for any new interactive elements
 - Test that features work without any server or build process
+- When adding new stamps:
+  - Add SVG template to `stampTemplates` object in script.js
+  - Add button with SVG preview to shape menu in index.html
+  - Add case to `createShapeCursor()` and `drawShape()` switch statements
+  - Use `MAIN_COLOR` placeholder in SVG for elements that should be colorable
+  - Consider using OpenMoji for consistency when appropriate

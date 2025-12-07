@@ -11,12 +11,18 @@ Simply double-click `index.html` to open it in your web browser!
 - **Drawing Tools:**
   - ✏️ Pen for freehand drawing
   - 🧹 Eraser to remove mistakes
-  - ⭕ Circle shapes
-  - ⬛ Square shapes
-  - ⭐ Star shapes
 
-- **Colors:**
-  - Red, Orange, Yellow, Green, Blue, Purple, Pink, Black
+- **Stamps:**
+  - Basic shapes: ⭕ Circle, ⬛ Square, ⭐ Star
+  - Animals: 🐰 Bunny, 🦋 Butterfly, 🐱 Cat
+  - Objects: 🚗 Car, 🌸 Flower
+  - Reactions: 👍 Thumbs Up, 👎 Thumbs Down
+  - Hanukkah: 🕎 Menorah, ✡️ Star of David, 🕯️ Candle, 🎁 Gift
+
+- **Customization:**
+  - 8 colors: Red, Orange, Yellow, Green, Blue, Purple, Pink, Black
+  - 3 brush sizes: Small, Medium, Large
+  - All stamps can be colored and sized
 
 - **Other:**
   - 🗑️ Clear button to start fresh
@@ -26,8 +32,7 @@ Simply double-click `index.html` to open it in your web browser!
 ## Future Enhancements
 
 - Save drawings
-- More shapes (triangle, heart, etc.)
-- Brush size selector
+- More stamps (seasonal themes, more animals, etc.)
 - Undo/Redo functionality
 - Background colors/patterns
 
